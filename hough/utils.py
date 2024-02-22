@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def create_mask(H, W):
     # Generate mask for ROI (Region of Interest)
     mask = np.zeros((H, W))
@@ -9,6 +10,7 @@ def create_mask(H, W):
                 mask[i, j] = 1
                 mask[H-3:H, :] = 0
     return mask
+
 
 def create_line(rho, theta, img):
     xs = []
