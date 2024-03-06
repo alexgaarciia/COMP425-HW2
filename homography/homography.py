@@ -1,5 +1,5 @@
 import numpy as np
-import cv2
+import cv2 as cv
 
 
 def matchPics(I1, I2):
@@ -8,14 +8,14 @@ def matchPics(I1, I2):
     I2_uint8 = (I2 * 255).astype(np.uint8)
 
     # Initialize SIFT detector
-    sift = cv2.SIFT_create()
+    sift = cv.SIFT_create()
 
     # Detect SIFT features and compute descriptors.
     keypoints1, descriptors1 = sift.detectAndCompute(I1_uint8, None)
     keypoints2, descriptors2 = sift.detectAndCompute(I2_uint8, None)
 
     # Initialize and use BFMatcher to match descriptors
-    bf = cv2.BFMatcher()
+    bf = cv.BFMatcher()
     matches = bf.knnMatch(descriptors1, descriptors2, k=2)
 
     # Apply Lowe's ratio test to filter matches
@@ -66,8 +66,8 @@ def computeHomography(locs1, locs2):
 
 def computeH_ransac(matches, locs1, locs2):
     # Compute the best fitting homography using RANSAC given a list of matching pairs
-    # Define parameters
-    bestH = None
+
+    # First, let's define some parameters
     max_inliers = []  # Largest set of match indices
     num_iters = 1000
     threshold = 5
@@ -105,7 +105,6 @@ def computeH_ransac(matches, locs1, locs2):
         # Keep the largest set of inliers
         if len(inliers) > len(max_inliers):
             max_inliers = inliers
-            bestH = H
 
     # Re-compute the best homography using all the inliers
     bestH = computeHomography(locs1[matches[max_inliers, 0]], locs2[matches[max_inliers, 1]])
@@ -114,15 +113,30 @@ def computeH_ransac(matches, locs1, locs2):
 
 
 def compositeH(H, template, img):
-    # Create a composite image after warping the template image on top
-    # of the image using homography
+    # Create a composite image after warping the template image on top of the image using homography
 
-    # Create mask of same size as template
+    # In order to do this, there are some steps that must be carried out:
+    # STEP 1: Create a mask of the same size as template. The mask indicates where the template exists within its own
+    # frame of reference. When the mask is later transformed by homography, it will indicate where the template should
+    # be placed on the target image.
+    mask = np.ones(template.shape, dtype=np.uint8)
 
-    # Warp mask by appropriate homography
+    # STEP 2: Warp mask by appropriate homography. In this part, the functon "warpPerspetive" applies the homography to
+    # every point in the mask, transforming it to the target image's perspective. It is necessary to ensure that it
+    # correctly lines up with the features on the target image. The transformed mask will be used to blend the template
+    # with the target image accurately.
+    warped_mask = cv.warpPerspective(mask, H, (img.shape[1], img.shape[0]))
 
-    # Warp template by appropriate homography
+    # STEP 3: Warp template by appropriate homography. This applies the geometric transformation to the template image
+    # so that it aligns with the perspective of the target image. This step is crucial for aligning the template image
+    # with the target image in a way that conforms to the perspective transformation described by the homography.
+    # This is what makes the template appear as though it's part of the target scene.
+    warped_template = cv.warpPerspective(template, H, (img.shape[1], img.shape[0]))
 
-    # Use mask to combine the warped template and the image
+    # STEP 4: Use mask to combine the warped template and the image. Once we avoid changing the original image, the
+    # pixels in composite_img where the warped mask is True are replaced with the corresponding pixels from the warped
+    # template image.
+    composite_img = img.copy()
+    composite_img[warped_mask==1] = warped_template[warped_mask==1]
 
     return composite_img
