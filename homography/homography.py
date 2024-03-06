@@ -3,16 +3,16 @@ import cv2 as cv
 
 
 def matchPics(I1, I2):
-    # Convert images to 8-bit unsigned integer format
-    I1_uint8 = (I1 * 255).astype(np.uint8)
-    I2_uint8 = (I2 * 255).astype(np.uint8)
+    # Convert images to uint8
+    I1 = (I1 * 255).astype(np.uint8)
+    I2 = (I2 * 255).astype(np.uint8)
 
     # Initialize SIFT detector
     sift = cv.SIFT_create()
 
     # Detect SIFT features and compute descriptors.
-    keypoints1, descriptors1 = sift.detectAndCompute(I1_uint8, None)
-    keypoints2, descriptors2 = sift.detectAndCompute(I2_uint8, None)
+    keypoints1, descriptors1 = sift.detectAndCompute(I1, None)
+    keypoints2, descriptors2 = sift.detectAndCompute(I2, None)
 
     # Initialize and use BFMatcher to match descriptors
     bf = cv.BFMatcher()
@@ -67,9 +67,13 @@ def computeHomography(locs1, locs2):
 def computeH_ransac(matches, locs1, locs2):
     # Compute the best fitting homography using RANSAC given a list of matching pairs
 
+    # Convert locs1 and locs2 from (row, column) to (x, y)
+    locs1 = np.flip(locs1, axis=1)
+    locs2 = np.flip(locs2, axis=1)
+
     # First, let's define some parameters
     max_inliers = []  # Largest set of match indices
-    num_iters = 1000
+    num_iters = 2000
     threshold = 5
 
     for _ in range(num_iters):
@@ -137,6 +141,6 @@ def compositeH(H, template, img):
     # pixels in composite_img where the warped mask is True are replaced with the corresponding pixels from the warped
     # template image.
     composite_img = img.copy()
-    composite_img[warped_mask==1] = warped_template[warped_mask==1]
+    composite_img[warped_mask == 1] = warped_template[warped_mask == 1]
 
     return composite_img
