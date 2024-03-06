@@ -72,7 +72,7 @@ def computeH_ransac(matches, locs1, locs2):
     num_iters = 1000
     threshold = 5
 
-    for _ in range(1):
+    for _ in range(num_iters):
         # Select four feature points (at random):
         points = np.random.choice(len(matches), 4, replace=False)
         selected_matches = matches[points]
@@ -86,8 +86,31 @@ def computeH_ransac(matches, locs1, locs2):
 
         # Calculate the inliers for this homography
         inliers = []
-        
-    return bestH, inliers
+        for i, match in enumerate(matches):
+            # Retrieve the coordinates of a point from the first and second image, and convert these coordinates to
+            # homogeneous coordinates
+            point1_homogeneous = np.append(locs1[match[0]], 1)
+            point2_homogeneous = np.append(locs2[match[1]], 1)
+
+            # Use the current homography to project point1_homogeneous from the first image into the coordinate frame of the second
+            # image, and normalize it
+            projected_point1 = np.dot(H, point1_homogeneous)
+            projected_point1 = projected_point1 / projected_point1[2]
+
+            # Compute SSD between the transformed point1 and point2
+            ssd = np.sum((projected_point1[:2] - point2_homogeneous[:2]) ** 2)
+            if ssd < threshold:
+                inliers.append(i)
+
+        # Keep the largest set of inliers
+        if len(inliers) > len(max_inliers):
+            max_inliers = inliers
+            bestH = H
+
+    # Re-compute the best homography using all the inliers
+    bestH = computeHomography(locs1[matches[max_inliers, 0]], locs2[matches[max_inliers, 1]])
+
+    return bestH, max_inliers
 
 
 def compositeH(H, template, img):
