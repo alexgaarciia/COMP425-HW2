@@ -5,7 +5,6 @@ from skimage import io
 from skimage.transform import resize
 from skimage.util import img_as_float
 from skimage.color import rgb2gray
-import numpy as np
 
 cv_desk = img_as_float(io.imread('cv_desk.jpg'))
 cv_desk_gray = rgb2gray(cv_desk)
