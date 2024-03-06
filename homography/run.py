@@ -5,6 +5,7 @@ from skimage import io
 from skimage.transform import resize
 from skimage.util import img_as_float
 from skimage.color import rgb2gray
+import numpy as np
 
 cv_desk = img_as_float(io.imread('cv_desk.jpg'))
 cv_desk_gray = rgb2gray(cv_desk)
@@ -18,7 +19,7 @@ matches, locs1, locs2 = matchPics(cv_cover, cv_desk)
 visualize_match(cv_cover, cv_desk_gray, locs1, locs2, matches)
 
 # resize hp_cover to have the same size of cv_cover
-hp_cover_resize = resize(hp_cover, cv_cover.shape, anti_aliasing = True)
+hp_cover_resize = resize(hp_cover, cv_cover.shape, anti_aliasing=True)
 
 # use RANSAC to estimate homography and find inlier matches
 bestH, inliers = computeH_ransac(matches, locs1, locs2)
