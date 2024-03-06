@@ -14,17 +14,25 @@ def matchPics(I1, I2):
     keypoints1, descriptors1 = sift.detectAndCompute(I1, None)
     keypoints2, descriptors2 = sift.detectAndCompute(I2, None)
 
-    # Initialize and use BFMatcher to match descriptors
+    # Initialize and use BFMatcher to match descriptors. The BFMatcher is used for matching feature descriptors between
+    # two sets of features. The key idea is to find the closest matches of descriptors in one set with those in the
+    # other set.
     bf = cv.BFMatcher()
     matches = bf.knnMatch(descriptors1, descriptors2, k=2)
 
-    # Apply Lowe's ratio test to filter matches
+    # Apply Lowe's ratio test to filter matches. The main reason why this is used is to filter out weak matches and
+    # retain only the strong ones. Easily explained, for each match, the distance of the clsoest neighbor to the
+    # distance of the second closest neighbor is compared. The match is considered good if the ratio is below a certain
+    # threshold.
     good_matches = []
     for m, n in matches:
         if m.distance < 0.75 * n.distance:
             good_matches.append(m)
 
-    # Prepare data for return. Extract locations of good matches.
+    # Prepare data for return by getting the locations of good matches. This line of code is creating a NumPy array
+    # named locs1 that contains the (x, y) coordinates of the keypoints from the first image that were identified as
+    # good matches. It does this by iterating over each match in good_matches, using the match's queryIdx attribute
+    # to find the corresponding keypoint in keypoints1, and then retrieving the (x, y) coordinates of that keypoint.
     locs1 = np.array([keypoints1[m.queryIdx].pt for m in good_matches])
     locs2 = np.array([keypoints2[m.trainIdx].pt for m in good_matches])
 
@@ -32,10 +40,10 @@ def matchPics(I1, I2):
     locs1 = np.flip(locs1, axis=1)
     locs2 = np.flip(locs2, axis=1)
 
-    # Prepare matches array in the format specified (index in locs1 to index in locs2)
-    matches_array = np.array([[i, i] for i in range(len(good_matches))])
+    # Prepare matches in the format specified (index in locs1 to index in locs2)
+    matches = np.array([[i, i] for i in range(len(good_matches))])
 
-    return matches_array, locs1, locs2
+    return matches, locs1, locs2
 
 
 def computeHomography(locs1, locs2):
@@ -65,8 +73,6 @@ def computeHomography(locs1, locs2):
 
 
 def computeH_ransac(matches, locs1, locs2):
-    # Compute the best fitting homography using RANSAC given a list of matching pairs
-
     # Convert locs1 and locs2 from (row, column) to (x, y)
     locs1 = np.flip(locs1, axis=1)
     locs2 = np.flip(locs2, axis=1)
@@ -117,8 +123,6 @@ def computeH_ransac(matches, locs1, locs2):
 
 
 def compositeH(H, template, img):
-    # Create a composite image after warping the template image on top of the image using homography
-
     # In order to do this, there are some steps that must be carried out:
     # STEP 1: Create a mask of the same size as template. The mask indicates where the template exists within its own
     # frame of reference. When the mask is later transformed by homography, it will indicate where the template should
