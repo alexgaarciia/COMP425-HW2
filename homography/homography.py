@@ -66,12 +66,27 @@ def computeHomography(locs1, locs2):
 
 def computeH_ransac(matches, locs1, locs2):
     # Compute the best fitting homography using RANSAC given a list of matching pairs
+    # Define parameters
+    bestH = None
+    max_inliers = []  # Largest set of match indices
+    num_iters = 1000
+    threshold = 5
 
-    ### YOUR CODE HERE
-    ### You should implement this function using Numpy only
+    for _ in range(1):
+        # Select four feature points (at random):
+        points = np.random.choice(len(matches), 4, replace=False)
+        selected_matches = matches[points]
 
-    ### END YOUR CODE
+        # Extract the matching points
+        points1 = locs1[selected_matches[:, 0]]
+        points2 = locs2[selected_matches[:, 1]]
 
+        # Compute the homography using the selected points
+        H = computeHomography(points1, points2)
+
+        # Calculate the inliers for this homography
+        inliers = []
+        
     return bestH, inliers
 
 
