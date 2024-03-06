@@ -20,7 +20,7 @@ visualize_match(cv_cover, cv_desk_gray, locs1, locs2, matches)
 # resize hp_cover to have the same size of cv_cover
 hp_cover_resize = resize(hp_cover, cv_cover.shape, anti_aliasing = True)
 
-# use RANSAC to estimate homograhy and find inlier matches
+# use RANSAC to estimate homography and find inlier matches
 bestH, inliers = computeH_ransac(matches, locs1, locs2)
 
 # visualize matching result after RANSAC
