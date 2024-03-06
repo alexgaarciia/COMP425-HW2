@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pylab as plt
 
+
 def visualize_box(template, target, H):
     # visualize the detected box of the template in target
     nrow, ncol = template.shape[:2]
@@ -15,6 +16,7 @@ def visualize_box(template, target, H):
     plt.imshow(target)
     plt.plot(x, y, 'r-')
     plt.show()    
+
 
 def visualize_match(template, target, locs1, locs2, matches):
     # assume template has fewer rows. Both template/target are grayscale
