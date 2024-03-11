@@ -43,14 +43,14 @@ hough_space, angles, distances = hough_line(masked_edges)
 
 # find the right lane by finding the peak in hough space
 accum, angles_peaks, dists_peaks = hough_line_peaks(hough_space, angles, distances)
-rho, theta = dists_peaks[0], angles_peaks[0]
-xs_blue, ys_blue = create_line(rho, theta, im)
+rho_blue, theta_blue = dists_peaks[0], angles_peaks[0]
+xs_blue, ys_blue = create_line(rho_blue, theta_blue, im)
 
 # zero out the values in accumulator around the neighborhood of the peak
 nms_radius = 100
 
 # convert peak coordinates to accumulator array indices
-peak_index = (np.argmin(np.abs(distances - rho)), np.argmin(np.abs(angles - theta)))
+peak_index = (np.argmin(np.abs(distances - rho_blue)), np.argmin(np.abs(angles - theta_blue)))
 
 # apply NMS
 for r_offset in range(-nms_radius, nms_radius + 1):
