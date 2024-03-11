@@ -44,15 +44,15 @@ hough_space, angles, distances = hough_line(masked_edges)
 # find the right lane by finding the peak in hough space
 accum, angles_peaks, dists_peaks = hough_line_peaks(hough_space, angles, distances)
 rho, theta = dists_peaks[0], angles_peaks[0]
-xs, ys = create_line(rho, theta, im)
+xs_blue, ys_blue = create_line(rho, theta, im)
 
 # zero out the values in accumulator around the neighborhood of the peak
 nms_radius = 100
 
-# Convert peak coordinates to accumulator array indices
+# convert peak coordinates to accumulator array indices
 peak_index = (np.argmin(np.abs(distances - rho)), np.argmin(np.abs(angles - theta)))
 
-# Apply NMS
+# apply NMS
 for r_offset in range(-nms_radius, nms_radius + 1):
     for theta_offset in range(-nms_radius, nms_radius + 1):
         if 0 <= peak_index[0] + r_offset < hough_space.shape[0] and 0 <= peak_index[1] + theta_offset < hough_space.shape[1]:
@@ -71,7 +71,7 @@ plt.axis('off')
 plt.title('Detected Lanes')
 
 # Plot the first lane (Blue lane)
-plt.plot(xs, ys, '-b', label='Blue Lane')
+plt.plot(xs_blue, ys_blue, '-b', label='Blue Lane')
 
 # Plot the second lane (Orange lane)
 plt.plot(xs_orange, ys_orange, color='orange', label='Orange Lane')
