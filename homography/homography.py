@@ -21,8 +21,8 @@ def matchPics(I1, I2):
     matches = bf.knnMatch(descriptors1, descriptors2, k=2)
 
     # Apply Lowe's ratio test to filter matches. The main reason why this is used is to filter out weak matches and
-    # retain only the strong ones. Easily explained, for each match, the distance of the clsoest neighbor to the
-    # distance of the second closest neighbor is compared. The match is considered good if the ratio is below a certain
+    # retain only the strong ones. Easily explained, for each match, the distance of the closest neighbor to the
+    # distance of the second-closest neighbor is compared. The match is considered good if the ratio is below a certain
     # threshold.
     good_matches = []
     for m, n in matches:
@@ -129,7 +129,7 @@ def compositeH(H, template, img):
     # be placed on the target image.
     mask = np.ones(template.shape, dtype=np.uint8)
 
-    # STEP 2: Warp mask by appropriate homography. In this part, the functon "warpPerspetive" applies the homography to
+    # STEP 2: Warp mask by appropriate homography. In this part, the functon "warpPerspective" applies the homography to
     # every point in the mask, transforming it to the target image's perspective. It is necessary to ensure that it
     # correctly lines up with the features on the target image. The transformed mask will be used to blend the template
     # with the target image accurately.
