@@ -80,7 +80,7 @@ def computeH_ransac(matches, locs1, locs2):
     # First, let's define some parameters
     max_inliers = []  # Largest set of match indices
     num_iters = 2000
-    threshold = 5
+    threshold = 5  # To consider inliers
 
     for _ in range(num_iters):
         # Select four feature points (at random):
