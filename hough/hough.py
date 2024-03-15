@@ -52,7 +52,9 @@ nms_radius = 100
 # convert peak coordinates to accumulator array indices
 peak_index = (np.argmin(np.abs(distances - rho_blue)), np.argmin(np.abs(angles - theta_blue)))
 
-# apply NMS
+# apply NMS: it iterates over a square neighborhood defined by nms_radius around the peak's coordinates in the Hough
+# space. For each point in this neighborhood, it zeroes out the accumulator values. This is done to suppress the weaker
+# lines near the strongest line to avoid detecting multiple, closely spaced lines as distinct lines.
 for r_offset in range(-nms_radius, nms_radius + 1):
     for theta_offset in range(-nms_radius, nms_radius + 1):
         if 0 <= peak_index[0] + r_offset < hough_space.shape[0] and 0 <= peak_index[1] + theta_offset < hough_space.shape[1]:
