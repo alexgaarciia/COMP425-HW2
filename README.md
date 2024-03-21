@@ -10,9 +10,9 @@ This project encompasses the implementation of advanced computer vision techniqu
 Navigate to the corresponding directory within the project folder in your terminal and execute the specific Python script for each part of the assignment.
 - For the Hough Transform part:
   - Navigate to ./hough/
-  - Run python hough.py
+  - Run `python hough.py`
 - For the RANSAC and Homography part:
   - Navigate to ./homography/
-  - Run python run.py
+  - Run `python run.py`
 
 Each script will generate visualization figures as required in the assignment instructions. These figures should be included in your report.
